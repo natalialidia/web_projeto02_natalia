@@ -4,10 +4,12 @@ module.exports = {
 
 	async index (req, res) {
 
-		let { limit = 10, offset = 0 } = req.query;
+		let { limit = 10, page = 0 } = req.query;
+
+		page = page > 0 ? page - 1 : 0;
 
 		limit = parseInt(limit);
-		offset = parseInt(offset);
+		offset = parseInt((page) * limit);
 
 		// Busca e conta todos os registros passando os dados para paginação
 		const customers = await Customer.findAndCountAll({

@@ -1,14 +1,19 @@
 const Schedule = require('../models/Schedule');
 const Customer = require('../models/Customer');
 const Service = require('../models/Service');
+const sequelize = require('sequelize');
 
 module.exports = {
 
 	async index (req, res) {
 
-		// Busca os agendamentos fazendo um 'join' com clientes e serviços
-		const schedules = await Schedule.findAll({
-			include: [{association: 'customer'}, {association: 'service'}]
+		// Por padrão usa o mês atual
+		let { month = new Date().getMonth() + 1 } = req.query;
+
+		// Busca os agendamentos do mês e conta-os fazendo um 'join' com clientes e serviços
+		const schedules = await Schedule.findAndCountAll({
+			include: [{association: 'customer'}, {association: 'service'}],
+			where: sequelize.where(sequelize.fn('month', sequelize.col('date_time')), parseInt(month)) // WHERE month('date_time') = month
 		});
 
 		if (!schedules) {
