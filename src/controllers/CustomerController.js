@@ -11,34 +11,63 @@ module.exports = {
 		limit = parseInt(limit);
 		offset = parseInt((page) * limit);
 
-		// Busca e conta todos os registros passando os dados para paginação
-		const customers = await Customer.findAndCountAll({
-			limit,
-			offset
-		});
+		try {
 
-		return res.json(customers);
+			// Busca e conta todos os registros passando os dados para paginação
+			const customers = await Customer.findAndCountAll({
+				limit,
+				offset
+			});
+
+			return res.json(customers);
+
+		} catch (error) {
+
+			return res.status(400).json({errors: "Não foi possível processar esta requisição"});
+
+		}
 
 	},
 
 	async get (req, res) {
 		const { id } = req.params;
 
-		const customer = await Customer.findByPk(id);
+		try {
 
-		if (!customer)
-			return res.status(404).json({error: "Cliente não encontrado"});
+			const customer = await Customer.findByPk(id);
 
-		return res.json(customer);
+			if (!customer)
+				return res.status(404).json({errors: "Cliente não encontrado"});
+
+			return res.json(customer);
+
+		} catch (error) {
+
+			return res.status(400).json({errors: "Não foi possível processar esta requisição"});
+
+		}
+
 
 	},
 
 	async create (req, res) {
 		const { name, instagram, phone } = req.body;
 
-		const customer = await Customer.create( { name, instagram, phone } );
+		try	{
+			
+			const customer = await Customer.create( { name, instagram, phone } );
 
-		return res.json(customer);
+			return res.json(customer);
+
+		} catch(error) {
+
+			if (error.name == 'SequelizeValidationError') {
+				return res.status(400).json({errors: error.errors.map(e => e.message)});
+			} else {
+				return res.status(400).json({errors: "Não foi possível processar esta requisição"});
+			}
+		}
+
 	},
 
 	async update (req, res) {
@@ -46,17 +75,36 @@ module.exports = {
 		
 		const { name, instagram, phone } = req.body;
 
-		const customer = await Customer.update( {name, instagram, phone }, { where: { id } } );
+		try {
 
-		return res.json(customer);
+			const customer = await Customer.update( {name, instagram, phone }, { where: { id } } );
+
+			return res.json(customer);
+
+		} catch(error) {
+
+			if (error.name == 'SequelizeValidationError') {
+				return res.status(400).json({errors: error.errors.map(e => e.message)});
+			} else {
+				return res.status(400).json({errors: "Não foi possível processar esta requisição"});
+			}
+
+		}		
 	},
 
 	async delete (req, res) {
 		const { id } = req.params;
 
-		const customer = await Customer.destroy( { where: { id } } );
+		try {
 
-		return res.send();
+			const customer = await Customer.destroy( { where: { id } } );
+
+			return res.send();
+
+		} catch(error) {
+			return res.status(400).json({errors: "Não foi possível processar esta requisição"});
+		}
+
 	}
 
 }

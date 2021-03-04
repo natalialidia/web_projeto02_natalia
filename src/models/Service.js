@@ -4,8 +4,32 @@ class Service extends Model {
 
 	static init(connection) {
 		super.init({
-			name: DataTypes.STRING,
-			description: DataTypes.STRING
+			name:{
+				type: DataTypes.STRING,
+				allowNull: false,
+				validate: {
+			    	notNull: {
+				        msg: 'Preencha o campo nome'
+				    },
+			    	notEmpty: { 
+			    		args: true, 
+			    		msg: 'Preencha o campo nome'
+			    	},
+			    	len: {
+			    		args:[3, 60],
+			    		msg: 'O nome deve ter entre 3 e 60 caracteres'
+			    	}
+			    }
+			},
+			description: {
+				type: DataTypes.STRING,
+				validate: {
+			    	len: {
+			    		max: 200,
+			    		msg: 'A descrição deve ter no máximo 200 caracteres'
+			    	}
+			    }
+			}
 		}, {
 			sequelize: connection
 		})

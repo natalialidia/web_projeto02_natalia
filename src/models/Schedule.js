@@ -4,7 +4,22 @@ class Schedule extends Model {
 
 	static init(connection) {
 		super.init({
-			date_time: DataTypes.DATE,
+			date_time: {
+				type: DataTypes.DATE,
+				allowNull: false,
+				validate: {
+			    	notNull: {
+				        msg: 'Preencha o campo data e hora'
+				    },
+			    	notEmpty: { 
+			    		args: true, 
+			    		msg: 'Preencha o campo data e hora'
+			    	},
+			    	isDate: {
+			    		msg: 'Preencha uma data válida'
+			    	}
+			    }
+			},
 		}, {
 			sequelize: connection
 		})
