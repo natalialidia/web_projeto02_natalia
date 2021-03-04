@@ -24,8 +24,8 @@ class Service extends Model {
 			description: {
 				type: DataTypes.STRING,
 				validate: {
-			    	len: {
-			    		max: 200,
+			    	max: {
+			    		args: 200,
 			    		msg: 'A descrição deve ter no máximo 200 caracteres'
 			    	}
 			    }

@@ -5,7 +5,7 @@ class Schedule extends Model {
 	static init(connection) {
 		super.init({
 			date_time: {
-				type: DataTypes.DATE,
+				type: 'DATETIME', //Não utiliza DataTypes pois ocorre conversão
 				allowNull: false,
 				validate: {
 			    	notNull: {
