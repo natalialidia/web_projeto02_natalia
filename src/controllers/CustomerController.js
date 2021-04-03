@@ -1,10 +1,11 @@
 const Customer = require('../models/Customer');
+const { Op } = require("sequelize");
 
 module.exports = {
 
 	async index (req, res) {
 
-		let { limit = 10, page = 0 } = req.query;
+		let { limit = 10, page = 0, search='' } = req.query;
 
 		page = page > 0 ? page - 1 : 0;
 
@@ -15,15 +16,21 @@ module.exports = {
 
 			// Busca e conta todos os registros passando os dados para paginação
 			const customers = await Customer.findAndCountAll({
+				where:{ 
+					'name': {
+						[Op.substring]: search // ... WHERE name LIKE %search%
+					}
+				},
 				limit,
-				offset
+				offset,
+				order: [['id', 'DESC']] //Mais recentes primeiro
 			});
 
-			return res.json(customers);
+			return res.json({customers: customers.rows, pagination: {limit, page: page+1, total: customers.count}});
 
 		} catch (error) {
 
-			return res.status(400).json({errors: "Não foi possível processar esta requisição"});
+			return res.status(400).json({errors: ["Não foi possível processar esta requisição"]});
 
 		}
 
@@ -43,7 +50,7 @@ module.exports = {
 
 		} catch (error) {
 
-			return res.status(400).json({errors: "Não foi possível processar esta requisição"});
+			return res.status(400).json({errors: ["Não foi possível processar esta requisição"]});
 
 		}
 
@@ -64,7 +71,7 @@ module.exports = {
 			if (error.name == 'SequelizeValidationError') {
 				return res.status(400).json({errors: error.errors.map(e => e.message)});
 			} else {
-				return res.status(400).json({errors: "Não foi possível processar esta requisição"});
+				return res.status(400).json({errors: ["Não foi possível processar esta requisição"]});
 			}
 		}
 
@@ -86,7 +93,7 @@ module.exports = {
 			if (error.name == 'SequelizeValidationError') {
 				return res.status(400).json({errors: error.errors.map(e => e.message)});
 			} else {
-				return res.status(400).json({errors: "Não foi possível processar esta requisição"});
+				return res.status(400).json({errors: ["Não foi possível processar esta requisição"]});
 			}
 
 		}		
@@ -102,7 +109,7 @@ module.exports = {
 			return res.send();
 
 		} catch(error) {
-			return res.status(400).json({errors: "Não foi possível processar esta requisição"});
+			return res.status(400).json({errors: ["Não foi possível processar esta requisição"]});
 		}
 
 	}
